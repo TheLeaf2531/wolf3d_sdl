@@ -13,8 +13,8 @@
 #ifndef TYPES_H
 # define TYPES_H
 
-# define WIDTH	1600
-# define HEIGHT	900
+# define WIDTH	160
+# define HEIGHT	90
 
 typedef unsigned int	uint32;
 typedef unsigned char	uint8;
@@ -41,7 +41,7 @@ typedef struct			s_wall
 {
 	int			w_id;
 	int			w_type;
-	t_vector2f	pos[2];
+	t_vector2d	pos[2];
 	void		*gate;
 }						t_wall;
 
@@ -72,12 +72,12 @@ typedef struct			s_map
 typedef struct			s_player
 {
 	int			c_sector;
-	t_vector2f	pos;
-	t_vector2f	rot;
+	t_vector2d	pos;
+	t_vector2d	rot;
 	float		speed;
 	float		r_speed;
-	t_vector2f	plane;
-	t_vector2f	raydir;
+	t_vector2d	plane;
+	t_vector2d	raydir;
 }						t_player;
 
 typedef struct			s_rgba
@@ -108,7 +108,7 @@ typedef struct			s_hit
 {
 	int			wall_hit;
 	double		dist;
-	t_vector2f	pos;
+	t_vector2d	pos;
 	int			type;
 }						t_hit;
 

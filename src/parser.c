@@ -60,8 +60,8 @@ static t_sector	*parse_sector(int fd)
 		if (l[0] != 'W')
 			return (NULL);
 		tab = ft_strsplit(l, ' ');
-		s->wall[i]->pos[0] = (t_vector2f){(float)ft_atof(tab[1]), (float)ft_atof(tab[2])};
-		s->wall[i]->pos[1] = (t_vector2f){ft_atof(tab[3]), ft_atof(tab[4])};
+		s->wall[i]->pos[0] = (t_vector2d){(double)ft_atof(tab[1]), (double)ft_atof(tab[2])};
+		s->wall[i]->pos[1] = (t_vector2d){(double)ft_atof(tab[3]), (double)ft_atof(tab[4])};
 		s->wall[i]->w_type = ft_atoi(tab[5]);
 		s->wall[i]->w_id = i;
 		free(l);

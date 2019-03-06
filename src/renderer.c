@@ -16,18 +16,21 @@ static void	set_pixel(t_texture *tex, t_rgba c, t_vector2i p)
 {
     Uint32 *pixels  = tex->pixels; 
     Uint32 mapped_color = SDL_MapRGBA(tex->format, c.r, c.g, c.b, c.a);
-	//printf("			p.y : %d  ; p.x : %d ; s->w :  %d\n", p.y, p.x, s->w);
+	//printf("			p.y : %d  ; p.x : %d ; tex->s.x  :  %d nmbr : %d\n", p.y, p.x, tex->s.x,p.y * tex->s.x + p.x );
     pixels[p.y * tex->s.x + p.x] = mapped_color;
 }
 
 static void vert_line(t_texture *tex, t_line l, t_rgba c)
 {
 	int		y;
-
+	//printf("l\n");
 	//printf("line x : %d, l.dr.x : %d, l.dr.y : %d\n", l.x, l.dr.x, l.dr.y);
+	//printf("	Drawing :\n");
+	//printf("		Start drawing line at : {%d, %d}\n", l.x, l.dr.x);
 	y = l.dr.x;
 	while (y < l.dr.y)
 	{
+		//printf("			Set pixel drawing line at : {%d, %d}\n", l.x, y);
 		set_pixel(tex, c, (t_vector2i){(int)l.x, y});
 		y++;
 	}
@@ -40,7 +43,8 @@ static t_rgba	get_color(t_hit hit)
 	if (hit.type == 1)
 		c = (t_rgba){(Uint8)120, (Uint8)120, (Uint8)120, (Uint8)255};
 	else
-		c = (t_rgba){(Uint8)120, (Uint8)0, (Uint8)0, (Uint8)255};
+		c = (t_rgba){(Uint8)120, (Uint8)130, (Uint8)0, (Uint8)255};
+	//printf("		Color selected is : %d %d %d %d\n", c.r, c.g, c.b, c.a);
 	return (c);
 }
 
@@ -48,41 +52,75 @@ static t_texture	*create_texture(t_env *e, t_vector2i s)
 {
 	t_texture	*tex;
 
-	tex = ft_memalloc(sizeof(tex));
-	tex->tex = SDL_CreateTexture(e->r, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, s.x, s.y);
+	//printf("	Create Texture : \n");
+	if (!(tex = ft_memalloc(sizeof(t_texture))))
+	{
+		//printf("Malloc failed on : create texture\n");
+		return (NULL);
+	}
+	tex->tex = SDL_CreateTexture(e->r, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, s.x, s.y);
+	if (tex->tex == NULL)
+		printf("SDL_Create texture failed\n");
 	tex->format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
-	SDL_LockTexture(tex->tex, NULL, &tex->tmp, &tex->pitch);
-	tex->pixels = tex->tmp;
+	if (SDL_LockTexture(tex->tex, NULL, &(tex->tmp), &(tex->pitch)) == -1)
+		printf("SDL_LockTexture failed: %s\n", SDL_GetError());
+	//printf("Pitch Value : %d\n", tex->pitch);
+	tex->pixels = (Uint32 *)tex->tmp;
+	if (tex->pixels == NULL)
+	{
+		printf("Cannot get pixels\n");
+		return (NULL);
+	}
 	tex->s = s;
 	return (tex);
 }
 
 int			render_frame(t_env  *e, t_vector2i s)
 {
-    int				x;
-    float			camX;
+    double				x;
+    double			camX;
     t_hit			hit;
     t_line			l;
     t_texture		*tex;
 
 	x = 0;
+	SDL_RenderClear(e->r);
 	tex = create_texture(e, s);
 	//sur = SDL_CreateRGBSurfaceWithFormat(0, s.x, s.y, 32, SDL_PIXELFORMAT_RGBA8888);
 	//SDL_LockSurface(sur);
+	//printf("\nRendering start :\n");
 	while (x < s.x)
 	{
-		camX = 2 * x / (double)s.x - 1;
-		e->p->raydir = (t_vector2f) {(float)(e->p->rot.x + e->p->plane.x * camX),
-									(float)(e->p->rot.y + e->p->plane.y * camX)}; 
+		//printf("	For x = %f\n",x);
+		camX = 2 * x / (double)s.x - (double)1;
+		//printf("		Camx : %f", camX);
+		e->p->raydir = (t_vector2d) {(double)(e->p->rot.x + e->p->plane.x * camX),
+									(double)(e->p->rot.y + e->p->plane.y * camX)};
+		//printf("		plane : {%f, %f}\n", e->p->plane.x, e->p->plane.y); 
+
+		//printf("		Raydir : {%f, %f}\n", e->p->raydir.x, e->p->raydir.y); 
 		hit = cast_ray(e->p, e->m, e->p->c_sector, -1);
-		l.x = x;
-		l.h = (int)(s.y / hit.dist);
-		l.dr.x = -l.h / 2 + s.y / 2 < 0 ? 0 : -l.h / 2 + s.y / 2;
-		l.dr.y = l.h / 2 + s.y / 2 >= s.y ? s.y - 1 : l.h / 2 + s.y / 2;
-		vert_line(tex, l, get_color(hit));
+		//printf("		Hit info :\n");
+		//printf("			Dist         : %f\n",hit.dist);
+		//printf("			Pos          : {%f ; %f}\n",hit.pos.x,hit.pos.y);
+		//printf("			Wall type    : %d\n",hit.type);
+		//printf("			Hit append   : %d\n",hit.wall_hit);
+		if (hit.wall_hit)
+		{
+			l.x = x;
+			l.h = (int)(s.y / hit.dist);
+			l.dr.x = (double)-l.h / 2 + s.y / 2 < 0 ? 0 : (double)-l.h / 2 + s.y / 2;
+			l.dr.y = (double)l.h / 2 + s.y / 2 >= s.y ? s.y - 1 : (double)l.h / 2 + s.y / 2;
+			//printf("		Line y start at  : %d\n", l.dr.x);
+			//printf("		Line y finish at : %d\n", l.dr.y);
+			vert_line(tex, l, get_color(hit));
+		}
 		x++;
 	}
-	SDL_RenderCopy(e->r, tex->tex, NULL, NULL);
+	SDL_FreeFormat(tex->format);
+	SDL_UnlockTexture(tex->tex);
+	if (SDL_RenderCopy(e->r, tex->tex, NULL, NULL) == -1)
+		printf("SDL_RenderCopy failed: %s\n",SDL_GetError());
 	SDL_RenderPresent(e->r);
 	//SDL_UnlockSurface(sur);
 	//if (SDL_RenderReadPixels(e->r, NULL, SDL_PIXELFORMAT_ARGB8888, sur->pixels, sizeof(Uint32) * (s.x )) == 0)

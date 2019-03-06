@@ -15,34 +15,39 @@
 static	int			is_coherent(t_player *p, t_wall *w, t_hit hit)
 {
 	int			is_legit;
-	t_vector2f	ran_x;
-	t_vector2f	ran_y;
+	t_vector2d	ran_x;
+	t_vector2d	ran_y;
 
-
-	//printf("				Hit     : {%f ; %f}\n", hit.pos.x, hit.pos.y);
-	//printf("				Wall s  : {%f ; %f}\n", w->pos[0].x, w->pos[0].y);
-	//printf("				Wall e  : {%f ; %f}\n", w->pos[1].x, w->pos[1].y);
 	ran_x.x = w->pos[0].x < w->pos[1].x ? w->pos[0].x : w->pos[1].x;
 	ran_x.y = w->pos[0].x < w->pos[1].x ? w->pos[1].x : w->pos[0].x;
 	ran_y.x = w->pos[0].y < w->pos[1].y ? w->pos[0].y : w->pos[1].y;
 	ran_y.y = w->pos[0].y < w->pos[1].y ? w->pos[1].y : w->pos[0].y;
-	//printf("				Range x : [%f ; %f]\n", ran_x.x, ran_x.y);
-	//printf("				Range y : [%f ; %f]\n", ran_y.x, ran_y.y);
+	if (w->w_type == 3)
+	{/*
+		printf("				Hit     : {%f ; %f}\n", hit.pos.x, hit.pos.y);
+		printf("				Wall s  : {%f ; %f}\n", w->pos[0].x, w->pos[0].y);
+		printf("				Wall e  : {%f ; %f}\n", w->pos[1].x, w->pos[1].y);
+		printf("				Range x : [%f ; %f]\n", ran_x.x, ran_x.y);
+		printf("				Range y : [%f ; %f]\n", ran_y.x, ran_y.y);*/
+	}
 	is_legit = 1;
-	if ((p->rot.x < 0 && hit.pos.x > p->pos.x) || (p->rot.y < 0 && hit.pos.y > p->pos.y)
-		|| (p->rot.x > 0 && hit.pos.x < p->pos.x) || (p->rot.y > 0 && hit.pos.y < p->pos.y))
+	if ((p->raydir.x < 0 && hit.pos.x > p->pos.x) || (p->raydir.y < 0 && hit.pos.y > p->pos.y)
+		|| (p->raydir.x > 0 && hit.pos.x < p->pos.x) || (p->raydir.y > 0 && hit.pos.y < p->pos.y))
 	{
-	//	printf("			The hit is not on the correct direction\n");
+		/*if (w->w_type == 3)
+			printf("			The hit is not on the correct direction\n");*/
 		is_legit = 0;
 	}
 	else if (hit.pos.x < ran_x.x || hit.pos.x > ran_x.y)
 	{
-	//	printf("			The hit is not in the x range of the wall\n");
+		/*if (w->w_type == 3)
+			printf("			The hit is not in the x range of the wall\n");*/
 		is_legit = 0;
 	}
 	else if (hit.pos.y < ran_y.x || hit.pos.y > ran_y.y)
 	{
-	//	printf("			The hit is not in the y range of the wall\n");
+		/*if (w->w_type == 3)
+			printf("			The hit is not in the y range of the wall\n");*/
 		is_legit = 0;
 	}
 	return (is_legit);	
@@ -66,16 +71,21 @@ static t_hit		intersection(int c_sector, t_wall *w,
 		mat[0][1] = 1;
 		mat[1][1] = 0;
 		mat[2][1] = w->pos[0].x;
-	//	printf("		%f   %f   %f\n",mat[0][0],mat[1][0],mat[2][0]);
-	//	printf("		%f   %f   %f\n",mat[0][1],mat[1][1],mat[2][1]);
 
 	}
 	if (mat[0][0] * mat[1][1] - mat[1][0] * mat[0][1] != 0)
 	{
+		//printf("	Matrice : \n");
+		//printf("		%f   %f   %f\n",mat[0][0],mat[1][0],mat[2][0]);
+		//printf("		%f   %f   %f\n",mat[0][1],mat[1][1],mat[2][1]);
+
 		hit.pos.x = (mat[2][0] * mat[1][1] - mat[2][1] * mat[1][0]) /
 			(mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0]);
+
 		hit.pos.y = (mat[0][0] * mat[2][1] - mat[2][0] * mat[0][1] ) /
 			(mat[0][0] * mat[1][1] - mat[1][0] * mat[0][1]);
+
+		//printf("			Pos          : {%f ; %f}\n",hit.pos.x,hit.pos.y);
 		if (!is_coherent(p, w, hit))
 		{
 			hit.wall_hit = 0;
@@ -84,13 +94,22 @@ static t_hit		intersection(int c_sector, t_wall *w,
 		}
 		if (w->w_type == 0 && w->gate != NULL)
 		{
+			//printf("Hit on gate\n");
 			g = (t_gate*)w->gate;
 			c_sector = g->s_in == c_sector ? g->s_out : g->s_in;
 			hit = cast_ray(p, m, c_sector, g->s_in == c_sector ? g->w_in->w_id : g->w_out->w_id);
 		}
-		hit.dist = sqrtf(powf(p->pos.x - hit.pos.x, 2) + powf(p->pos.y - hit.pos.y, 2));
-		hit.wall_hit = 1;
-		hit.type = w->w_type;
+		else
+		{
+			if (w->w_type == 3)
+				printf("Hit on type %d\n", w->w_type);
+ 			hit.dist = sqrtl(powl(p->pos.x - hit.pos.x, 2) + powf(p->pos.y - hit.pos.y, 2));
+			if (w->w_type == 3)
+				printf("With a dist of %f\n", hit.dist);
+			hit.dist = hit.dist * ((p->rot.x * p->raydir.x + p->rot.y * p->raydir.y) / (hypotl(p->rot.x, p->rot.y) * hypotl(p->raydir.x, p->raydir.y)));
+			hit.wall_hit = 1;
+			hit.type = w->w_type;
+		}
 	}
 	else
 		hit.wall_hit = 0;
@@ -112,9 +131,9 @@ t_hit		cast_ray(t_player *p, t_map *m, int c_sector, int ex)
 	int 			i;
 	t_hit			hit;
 
-	mat[0][0] =  p->rot.y;
-	mat[1][0] = -p->rot.x;
-	mat[2][0] = -(p->rot.x * p->pos.y - p->rot.y * p->pos.x);
+	mat[0][0] =  p->raydir.y;
+	mat[1][0] = -p->raydir.x;
+	mat[2][0] = -(p->raydir.x * p->pos.y - p->raydir.y * p->pos.x);
 	hit.wall_hit = 0;
 	i = 0;
 	//printf("Test in sector : %d\n", c_sector);
