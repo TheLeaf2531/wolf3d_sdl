@@ -40,11 +40,12 @@ int main(int argc, char *argv[])
 			i++;
 		}
 		i = 0;
-		while (i < 1)
+		while (i < 1000)
 		{
-			//e->p = rotate_player(e->p, -1);
+			printf("%d\n",i);
+			e->p = rotate_player(e->p, -1);
 			render_frame(e, (t_vector2i){(int)WIDTH, (int)HEIGHT});
-			SDL_Delay(10000);
+			SDL_Delay(1);
 			i++;
 		}
 		//SDL_RenderPresent(e->r);

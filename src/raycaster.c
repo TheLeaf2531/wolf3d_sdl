@@ -61,7 +61,7 @@ static t_hit		intersection(int c_sector, t_wall *w,
 
 	if (w->pos[0].x != w->pos[1].x)
 	{
-		mat[0][1] = (w->pos[1].y - w->pos[1].y) / (w->pos[1].x - w->pos[0].x);
+		mat[0][1] = (w->pos[1].y - w->pos[0].y) / (w->pos[1].x - w->pos[0].x);
 		mat[1][1] = -1;
 		mat[2][1] = -(w->pos[1].y - mat[0][1] * w->pos[1].x);
 	}
@@ -101,11 +101,11 @@ static t_hit		intersection(int c_sector, t_wall *w,
 		}
 		else
 		{
-			if (w->w_type == 3)
-				printf("Hit on type %d\n", w->w_type);
+			//if (w->w_type == 3)
+			//	printf("Hit on type %d\n", w->w_type);
  			hit.dist = sqrtl(powl(p->pos.x - hit.pos.x, 2) + powf(p->pos.y - hit.pos.y, 2));
-			if (w->w_type == 3)
-				printf("With a dist of %f\n", hit.dist);
+			//if (w->w_type == 3)
+			//	printf("With a dist of %f\n", hit.dist);
 			hit.dist = hit.dist * ((p->rot.x * p->raydir.x + p->rot.y * p->raydir.y) / (hypotl(p->rot.x, p->rot.y) * hypotl(p->raydir.x, p->raydir.y)));
 			hit.wall_hit = 1;
 			hit.type = w->w_type;

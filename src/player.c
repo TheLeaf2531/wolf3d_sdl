@@ -19,7 +19,7 @@ t_player	*rotate_player(t_player *p, int left)
 	t_vector2d	new_plane;
 	double		speed;
 
-	speed = -p->r_speed * left;
+	speed = p->r_speed * left;
 	new_rotation = (t_vector2d){
 		p->rot.x * cos(speed) - p->rot.y * sin(speed),
 		p->rot.x * sin(speed) + p->rot.y * cos(speed)
@@ -72,7 +72,7 @@ t_player	*init_player(int fd)
 	p->pos = (t_vector2d) {(float)ft_atof(tab[2]), (float)ft_atof(tab[3])};
 	p->rot = (t_vector2d) {(float)atof(tab[4]), (float)atof(tab[5])};
 	p->plane =(t_vector2d) {(float) 0, (float)0.66};
-	p->r_speed = 0.174533;
+	p->r_speed = 0.0174533;
 	printf("Player :\n");
 	printf("			Current sector	: %d\n", p->c_sector);
 	printf("			Pos             : {%f ; %f}\n", p->pos.x, p->pos.y);

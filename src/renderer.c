@@ -122,6 +122,8 @@ int			render_frame(t_env  *e, t_vector2i s)
 	if (SDL_RenderCopy(e->r, tex->tex, NULL, NULL) == -1)
 		printf("SDL_RenderCopy failed: %s\n",SDL_GetError());
 	SDL_RenderPresent(e->r);
+	SDL_DestroyTexture(tex->tex);
+	free(tex);
 	//SDL_UnlockSurface(sur);
 	//if (SDL_RenderReadPixels(e->r, NULL, SDL_PIXELFORMAT_ARGB8888, sur->pixels, sizeof(Uint32) * (s.x )) == 0)
 	//	printf("%s\n",SDL_GetError());
