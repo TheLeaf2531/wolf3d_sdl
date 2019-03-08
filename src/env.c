@@ -35,6 +35,7 @@ t_env					*init_env(t_vector2i s)
 
 	if (!(e = ft_memalloc(sizeof(t_env))))
 		return (NULL);
+	e->size = s;
 	if (!(e->w = init_window(s)))
 		return (NULL);
 	if (!(e->r = SDL_CreateRenderer(e->w, -1, SDL_RENDERER_SOFTWARE)))

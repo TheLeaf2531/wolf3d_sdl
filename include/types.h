@@ -13,8 +13,8 @@
 #ifndef TYPES_H
 # define TYPES_H
 
-# define WIDTH	160
-# define HEIGHT	90
+# define WIDTH	1600
+# define HEIGHT	900
 
 typedef unsigned int	uint32;
 typedef unsigned char	uint8;
@@ -78,6 +78,8 @@ typedef struct			s_player
 	float		r_speed;
 	t_vector2d	plane;
 	t_vector2d	raydir;
+	t_vector2f	mvmt;
+	int			rotate;
 }						t_player;
 
 typedef struct			s_rgba
@@ -108,7 +110,7 @@ typedef struct			s_hit
 {
 	int			wall_hit;
 	double		dist;
-	t_vector2d	pos;
+	t_vector2f	pos;
 	int			type;
 }						t_hit;
 
@@ -122,12 +124,21 @@ typedef struct 			s_texture
 	int				pitch;
 }						t_texture;
 
+typedef struct			s_time
+{
+	int			frame_start;
+	int			frame_end;
+	float		delta_time;
+}						t_time;
 
 typedef struct			s_env
 {
-	SDL_Window	*w;
+	SDL_Window		*w;
+	t_vector2i		size;
 	SDL_Renderer	*r;
-	t_map		*m;
-	t_player	*p;
+	t_map			*m;
+	t_player		*p;
+	t_time			time;
+	int 		running;
 }						t_env;
 #endif

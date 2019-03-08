@@ -15,21 +15,13 @@
 static	int			is_coherent(t_player *p, t_wall *w, t_hit hit)
 {
 	int			is_legit;
-	t_vector2d	ran_x;
-	t_vector2d	ran_y;
+	t_vector2f	ran_x;
+	t_vector2f	ran_y;
 
 	ran_x.x = w->pos[0].x < w->pos[1].x ? w->pos[0].x : w->pos[1].x;
 	ran_x.y = w->pos[0].x < w->pos[1].x ? w->pos[1].x : w->pos[0].x;
 	ran_y.x = w->pos[0].y < w->pos[1].y ? w->pos[0].y : w->pos[1].y;
 	ran_y.y = w->pos[0].y < w->pos[1].y ? w->pos[1].y : w->pos[0].y;
-	if (w->w_type == 3)
-	{/*
-		printf("				Hit     : {%f ; %f}\n", hit.pos.x, hit.pos.y);
-		printf("				Wall s  : {%f ; %f}\n", w->pos[0].x, w->pos[0].y);
-		printf("				Wall e  : {%f ; %f}\n", w->pos[1].x, w->pos[1].y);
-		printf("				Range x : [%f ; %f]\n", ran_x.x, ran_x.y);
-		printf("				Range y : [%f ; %f]\n", ran_y.x, ran_y.y);*/
-	}
 	is_legit = 1;
 	if ((p->raydir.x < 0 && hit.pos.x > p->pos.x) || (p->raydir.y < 0 && hit.pos.y > p->pos.y)
 		|| (p->raydir.x > 0 && hit.pos.x < p->pos.x) || (p->raydir.y > 0 && hit.pos.y < p->pos.y))
@@ -63,7 +55,7 @@ static t_hit		intersection(int c_sector, t_wall *w,
 	{
 		mat[0][1] = (w->pos[1].y - w->pos[0].y) / (w->pos[1].x - w->pos[0].x);
 		mat[1][1] = -1;
-		mat[2][1] = -(w->pos[1].y - mat[0][1] * w->pos[1].x);
+		mat[2][1] = -(w->pos[0].y - mat[0][1] * w->pos[0].x);
 	}
 	else
 	{
@@ -89,7 +81,6 @@ static t_hit		intersection(int c_sector, t_wall *w,
 		if (!is_coherent(p, w, hit))
 		{
 			hit.wall_hit = 0;
-			//printf("			No hit :(\n");
 			return (hit);
 		}
 		if (w->w_type == 0 && w->gate != NULL)

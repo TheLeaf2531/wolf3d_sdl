@@ -31,5 +31,5 @@ t_env			*load_file(char *filename, t_env *e);
 t_player		*init_player(int fd);
 t_hit           cast_ray(t_player *p, t_map *m, int c_sector, int ex);
 int				render_frame(t_env  *e, t_vector2i s);
-t_player		*rotate_player(t_player *p, int left);
+t_player		*rotate_player(t_player *p, int left, float delta_time);
 #endif
