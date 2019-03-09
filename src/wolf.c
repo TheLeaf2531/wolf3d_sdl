@@ -16,16 +16,16 @@
 void	update_player(t_env *e)
 {
 	if (e->p->rotate != 0)
-	{
-		rotate_player(e->p, e->p->rotate, e->time.delta_time);
-	}
+		rotate_player(e->p, -e->p->rotate, e->time.delta_time);
+	if (e->p->mvmt.x || e->p->mvmt.y)
+		move_player(e, e->p, e->time.delta_time);
 }
 
 void	mouse_event(t_env *e, SDL_Event ev)
 {
 	if (ev.type == SDL_MOUSEMOTION)
 	{
-		e->p->rotate = ev.motion.xrel < 0 ? ev.motion.xrel : -ev.motion.xrel;
+		e->p->rotate = ev.motion.xrel;
 		e->p->rotate = !ev.motion.xrel ? 0 : e->p->rotate;
 	}
 	else
@@ -47,6 +47,14 @@ void	keyboard_event(t_env *e, SDL_Event ev)
 	}
 	else
 	{
+		if (ev.key.keysym.sym == SDLK_w)
+			e->p->mvmt.y = 0;
+		if (ev.key.keysym.sym == SDLK_s)
+			e->p->mvmt.y = 0;
+		if (ev.key.keysym.sym == SDLK_a)
+			e->p->mvmt.x = 0;
+		if (ev.key.keysym.sym == SDLK_d)
+			e->p->mvmt.x = 0;
 		if (ev.key.keysym.sym == SDLK_ESCAPE)
 					e->running = 0;
 	}
@@ -83,6 +91,8 @@ int main(int argc, char *argv[])
 		}
 		e->time = (t_time){(int)0, (int)0, (int)0};
 		e->running = 1;
+		SDL_SetRelativeMouseMode(1);
+		//SDL_ShowCursor(SDL_DISABLE);
 		while (e->running)
 		{
 			//printf("DeltaTime : %f\n", e->time.delta_time);

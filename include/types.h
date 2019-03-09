@@ -78,7 +78,7 @@ typedef struct			s_player
 	float		r_speed;
 	t_vector2d	plane;
 	t_vector2d	raydir;
-	t_vector2f	mvmt;
+	t_vector2d	mvmt;
 	int			rotate;
 }						t_player;
 

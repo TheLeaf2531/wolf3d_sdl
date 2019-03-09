@@ -99,7 +99,7 @@ int			render_frame(t_env  *e, t_vector2i s)
 		//printf("		plane : {%f, %f}\n", e->p->plane.x, e->p->plane.y); 
 
 		//printf("		Raydir : {%f, %f}\n", e->p->raydir.x, e->p->raydir.y); 
-		hit = cast_ray(e->p, e->m, e->p->c_sector, -1);
+		hit = cast_ray(e->p, e->m, e->p->raydir, e->p->c_sector, -1);
 		//printf("		Hit info :\n");
 		//printf("			Dist         : %f\n",hit.dist);
 		//printf("			Pos          : {%f ; %f}\n",hit.pos.x,hit.pos.y);

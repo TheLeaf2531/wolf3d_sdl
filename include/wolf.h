@@ -26,10 +26,15 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+# define degreesToRadians(angleDegrees) ((angleDegrees) * M_PI / 180.0)
+# define radiansToDegrees(angleRadians) ((angleRadians) * 180.0 / M_PI)
+
 t_env			*init_env(t_vector2i s);
 t_env			*load_file(char *filename, t_env *e);
 t_player		*init_player(int fd);
-t_hit           cast_ray(t_player *p, t_map *m, int c_sector, int ex);
+t_hit			cast_ray(t_player *p, t_map *m, t_vector2d dir, int c_sector, int ex);
 int				render_frame(t_env  *e, t_vector2i s);
 t_player		*rotate_player(t_player *p, int left, float delta_time);
+void			move_player(t_env *e, t_player *p, float delta_time);
+
 #endif

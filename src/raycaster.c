@@ -88,7 +88,7 @@ static t_hit		intersection(int c_sector, t_wall *w,
 			//printf("Hit on gate\n");
 			g = (t_gate*)w->gate;
 			c_sector = g->s_in == c_sector ? g->s_out : g->s_in;
-			hit = cast_ray(p, m, c_sector, g->s_in == c_sector ? g->w_in->w_id : g->w_out->w_id);
+			hit = cast_ray(p, m, p->raydir, c_sector, g->s_in == c_sector ? g->w_in->w_id : g->w_out->w_id);
 		}
 		else
 		{
@@ -116,12 +116,13 @@ static t_hit		intersection(int c_sector, t_wall *w,
 				else
 					printf("			Sector %d, Wall %d\n", g->s_in, g->w_in->w_id);
  **/
-t_hit		cast_ray(t_player *p, t_map *m, int c_sector, int ex)
+t_hit		cast_ray(t_player *p, t_map *m, t_vector2d dir, int c_sector, int ex)
 {
 	double			mat[3][2];
 	int 			i;
 	t_hit			hit;
 
+	p->raydir = dir;
 	mat[0][0] =  p->raydir.y;
 	mat[1][0] = -p->raydir.x;
 	mat[2][0] = -(p->raydir.x * p->pos.y - p->raydir.y * p->pos.x);
