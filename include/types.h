@@ -112,6 +112,7 @@ typedef struct			s_hit
 	double		dist;
 	t_vector2f	pos;
 	int			type;
+	t_wall		*wall;
 }						t_hit;
 
 typedef struct 			s_texture

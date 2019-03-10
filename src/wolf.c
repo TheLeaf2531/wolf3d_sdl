@@ -34,6 +34,7 @@ void	mouse_event(t_env *e, SDL_Event ev)
 
 void	keyboard_event(t_env *e, SDL_Event ev)
 {
+
 	if (ev.type == SDL_KEYDOWN)
 	{
 		if (ev.key.keysym.sym == SDLK_w)
@@ -45,7 +46,7 @@ void	keyboard_event(t_env *e, SDL_Event ev)
 		if (ev.key.keysym.sym == SDLK_d)
 			e->p->mvmt.x = -1;
 	}
-	else
+	if (ev.type == SDL_KEYUP)
 	{
 		if (ev.key.keysym.sym == SDLK_w)
 			e->p->mvmt.y = 0;
@@ -56,15 +57,15 @@ void	keyboard_event(t_env *e, SDL_Event ev)
 		if (ev.key.keysym.sym == SDLK_d)
 			e->p->mvmt.x = 0;
 		if (ev.key.keysym.sym == SDLK_ESCAPE)
-					e->running = 0;
+			e->running = 0;
 	}
 }
 
 void	update_event(t_env *e)
 {
 	SDL_Event	ev;
-	
-	if ( SDL_PollEvent(&ev) == 1 )
+
+	while (SDL_PollEvent(&ev))
 	{
 		if (ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP)
 			keyboard_event(e, ev);

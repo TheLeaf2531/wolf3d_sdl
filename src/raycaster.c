@@ -100,6 +100,7 @@ static t_hit		intersection(int c_sector, t_wall *w,
 			hit.dist = hit.dist * ((p->rot.x * p->raydir.x + p->rot.y * p->raydir.y) / (hypotl(p->rot.x, p->rot.y) * hypotl(p->raydir.x, p->raydir.y)));
 			hit.wall_hit = 1;
 			hit.type = w->w_type;
+			hit.wall = w;
 		}
 	}
 	else

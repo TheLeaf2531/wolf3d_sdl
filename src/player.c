@@ -14,34 +14,51 @@
 
 void		move_player(t_env *e, t_player *p, float delta_time)
 {
-	t_vector2d	mvmnt;
-	t_vector2d  mv_tmp;
+	t_vector2d	n_pos;
 	t_vector2d	d;
 	t_hit		hit;
-	float 		a;
+	t_gate		*g;
 
-	mv_tmp = p->mvmt;
-	//printf("p->mvmnt {%f ; %f}\n", p->mvmt.x, p->mvmt.y);
 	if (p->mvmt.y != 0)
 	{
-		mvmnt.x = p->speed * delta_time * p->mvmt.y * p->rot.x + p->pos.x;
-		mvmnt.y = p->speed * delta_time * p->mvmt.y * p->rot.y + p->pos.y;
+		n_pos.x = p->speed * delta_time * p->mvmt.y * p->rot.x;
+		n_pos.y = p->speed * delta_time * p->mvmt.y * p->rot.y;
 	}
 	if (p->mvmt.x != 0)
 	{
 		d.x = p->rot.x  * cos(degreesToRadians(p->mvmt.x * 90)) - p->rot.y * sin(degreesToRadians(p->mvmt.x * 90));
 		d.y = p->rot.x  * sin(degreesToRadians(p->mvmt.x * 90)) + p->rot.y * cos(degreesToRadians(p->mvmt.x * 90));
-		mvmnt.x = p->speed * delta_time  * d.x + p->pos.x;
-		mvmnt.y = p->speed * delta_time  * d.y + p->pos.y;
+		n_pos.x = p->speed * delta_time  * d.x;
+		n_pos.y = p->speed * delta_time  * d.y;
 	}
+	hit = cast_ray(p, e->m, n_pos, p->c_sector, -1);
+	n_pos.x += p->pos.x;
+	n_pos.y += p->pos.y;
+	if (hit.type)
+	{
+		n_pos.x = (n_pos.x < hit.pos.x) == (p->pos.x < hit.pos.x) ? n_pos.x : p->pos.x;
+		n_pos.y = (n_pos.y < hit.pos.y) == (p->pos.y < hit.pos.y) ? n_pos.y : p->pos.y;
+	}
+	else
+	{
+		g = hit.wall->gate;
+	//	printf("%d\n", &g);
+		if (!g)
+			p->c_sector = p->c_sector == g->s_in ? g->s_out : g->s_in;
+	}
+	p->pos = n_pos;
+
+
+	/*
 	a = atan2f(p->rot.y - p->mvmt.y, p->rot.x - p->mvmt.x);
-	p->mvmt.x = cosf(a * p->pos.x) - sinf(a * p->pos.y);
-	p->mvmt.y = sinf(a * p->pos.x) + cosf(a * p->pos.y);
+	p->mvmt.x = cosf(a * p->mvmt.x) - sinf(a * p->mvmt.y);
+	p->mvmt.y = sinf(a * p->mvmt.x) + cosf(a * p->mvmt.y);
 	hit = cast_ray(p, e->m, p->mvmt, p->c_sector, -1);
 	p->mvmt = mv_tmp;
 	mvmnt.x = (mvmnt.x < hit.pos.x) == (p->pos.x < hit.pos.x) ? mvmnt.x : p->pos.x;
 	mvmnt.y = (mvmnt.y < hit.pos.y) == (p->pos.y < hit.pos.y) ? mvmnt.y : p->pos.y;
 	p->pos = mvmnt;
+	p->mvmt = (t_vector2d){0,0};*/
 	//printf("mvmnt {%f ; %f}\n", mvmnt.x, mvmnt.y);
 	/*
 if (mvmnt.x > 0 && mvmnt.y > 0
