@@ -12,7 +12,48 @@
 
 #include "wolf.h"
 
-static	int			is_coherent(t_player *p, t_wall *w, t_hit hit)
+t_ray				set_ray(t_map *map, t_vector2f origin,
+							t_vector2f direction, int origin_sector,
+							int gate_stop)
+{
+	t_ray		ray;
+
+	ray.map = map;
+	ray.origin = origin;
+	ray.direction = direction;
+	ray.current_sector = origin_sector;
+	ray.origin_sector = origin_sector;
+	ray.excluded_wall = -1;
+	ray.gate_stop = gate_stop;
+	return (ray);
+}
+
+
+static	int			coherent_hit(t_ray ray, t_wall *w, t_hit hit)
+{
+	int			is_legit;
+	t_vector2f	ran_x;
+	t_vector2f	ran_y;
+
+	ran_x.x = w->pos[0].x < w->pos[1].x ? w->pos[0].x : w->pos[1].x;
+	ran_x.y = w->pos[0].x < w->pos[1].x ? w->pos[1].x : w->pos[0].x;
+	ran_y.x = w->pos[0].y < w->pos[1].y ? w->pos[0].y : w->pos[1].y;
+	ran_y.y = w->pos[0].y < w->pos[1].y ? w->pos[1].y : w->pos[0].y;
+	is_legit = 1;
+	if ((ray.direction.x < 0 && hit.pos.x > ray.origin.x) ||
+			(ray.direction.y < 0 && hit.pos.y > ray.origin.y) ||
+			(ray.direction.x > 0 && hit.pos.x < ray.origin.x) ||
+			(ray.direction.y > 0 && hit.pos.y < ray.origin.y))
+		is_legit = 0;
+	else if (hit.pos.x < ran_x.x || hit.pos.x > ran_x.y)
+		is_legit = 0;
+	else if (hit.pos.y < ran_y.x || hit.pos.y > ran_y.y)
+		is_legit = 0;
+	return (is_legit);	
+}
+
+/*
+static	int			coherent_hit(t_player *p, t_wall *w, t_hit hit)
 {
 	int			is_legit;
 	t_vector2f	ran_x;
@@ -25,26 +66,56 @@ static	int			is_coherent(t_player *p, t_wall *w, t_hit hit)
 	is_legit = 1;
 	if ((p->raydir.x < 0 && hit.pos.x > p->pos.x) || (p->raydir.y < 0 && hit.pos.y > p->pos.y)
 		|| (p->raydir.x > 0 && hit.pos.x < p->pos.x) || (p->raydir.y > 0 && hit.pos.y < p->pos.y))
-	{
-		/*if (w->w_type == 3)
-			printf("			The hit is not on the correct direction\n");*/
 		is_legit = 0;
-	}
 	else if (hit.pos.x < ran_x.x || hit.pos.x > ran_x.y)
-	{
-		/*if (w->w_type == 3)
-			printf("			The hit is not in the x range of the wall\n");*/
 		is_legit = 0;
-	}
 	else if (hit.pos.y < ran_y.x || hit.pos.y > ran_y.y)
-	{
-		/*if (w->w_type == 3)
-			printf("			The hit is not in the y range of the wall\n");*/
 		is_legit = 0;
-	}
 	return (is_legit);	
 }
+*/
 
+static t_hit		intersection(t_ray ray, t_wall *w)
+{
+	t_hit		hit;
+	t_gate		*gate;
+
+
+	if (ray.mat[0][0] * ray.mat[1][1] - ray.mat[1][0] * ray.mat[0][1] != 0)
+	{
+		hit.pos.x = (ray.mat[2][0] * ray.mat[1][1] - ray.mat[2][1] * ray.mat[1][0]) /
+				(ray.mat[0][0] * ray.mat[1][1] - ray.mat[0][1] * ray.mat[1][0]);
+		hit.pos.y = (ray.mat[0][0] * ray.mat[2][1] - ray.mat[2][0] * ray.mat[0][1] ) /
+				(ray.mat[0][0] * ray.mat[1][1] - ray.mat[1][0] * ray.mat[0][1]);
+		if (coherent_hit(ray, w, hit))
+		{
+			if (w->w_type == 0 && w->gate && !ray.gate_stop)
+			{
+				gate = (t_gate*)w->gate;
+				ray.current_sector = gate->s_in == ray.current_sector ?
+					gate->s_out : gate->s_in;
+				ray.excluded_wall = gate->s_in == ray.current_sector ?
+					gate->w_in->w_id : gate->w_out->w_id; 
+				hit = cast_ray(ray);
+			}
+			else
+			{
+				hit.dist = sqrtl(powl(ray.origin.x - hit.pos.x, 2)
+							+ powl(ray.origin.y - hit.pos.y, 2));
+				hit.result = !w->gate ? 1 : 2;
+				hit.type = w->w_type;
+				hit.wall = w;
+			}		
+		}
+		else
+			hit.result = 0;
+	}
+	else
+		hit.result = 0;
+	return (hit);
+}
+
+/*
 static t_hit		intersection(int c_sector, t_wall *w,
 							double mat[3][2], t_player *p, t_map *m) 
 {
@@ -107,7 +178,7 @@ static t_hit		intersection(int c_sector, t_wall *w,
 		hit.wall_hit = 0;
 	return (hit);
 }
-
+*/
 /**
 	t_gate *g;
 				g = (t_gate*)(m->sector[i]->wall[y]->gate);
@@ -117,6 +188,43 @@ static t_hit		intersection(int c_sector, t_wall *w,
 				else
 					printf("			Sector %d, Wall %d\n", g->s_in, g->w_in->w_id);
  **/
+
+
+t_hit		cast_ray(t_ray ray)
+{
+	t_hit		hit;
+	int			i;
+	t_wall		*w;
+
+	ray.mat[0][0] = ray.direction.y;
+	ray.mat[1][0] = -ray.direction.x;
+	ray.mat[2][0] = -(ray.direction.x * ray.origin.y
+						- ray.direction.y * ray.origin.x);
+	hit.result = 0;
+	i = 0;
+	while (i < ray.map->sector[ray.current_sector]->wall_nbr && !hit.result)
+	{
+		if (i != ray.excluded_wall)
+		{
+			w = ray.map->sector[ray.current_sector]->wall[i];
+			ray.mat[0][1] = (w->pos[1].y - w->pos[0].y) / (w->pos[1].x - w->pos[0].x);
+			ray.mat[1][1] = -1;
+			ray.mat[2][1] =	-(w->pos[0].y - ray.mat[0][1] * w->pos[0].x);				
+			if (w->pos[0].x == w->pos[1].x)
+			{
+				ray.mat[0][1] = 1;
+				ray.mat[1][1] = 0;
+				ray.mat[2][1] = w->pos[0].x;
+			}
+			hit = intersection(ray,
+					ray.map->sector[ray.current_sector]->wall[i]);
+		}
+		i++;
+	}
+	return (hit);
+}
+
+/*
 t_hit		cast_ray(t_player *p, t_map *m, t_vector2d dir, int c_sector, int ex)
 {
 	double			mat[3][2];
@@ -141,4 +249,4 @@ t_hit		cast_ray(t_player *p, t_map *m, t_vector2d dir, int c_sector, int ex)
 		i++;
 	}
 	return (hit);
-}
+}*/

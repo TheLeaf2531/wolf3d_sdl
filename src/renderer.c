@@ -77,11 +77,12 @@ static t_texture	*create_texture(t_env *e, t_vector2i s)
 
 int			render_frame(t_env  *e, t_vector2i s)
 {
-    double				x;
-    double			camX;
+    float				x;
+    float			camX;
     t_hit			hit;
     t_line			l;
     t_texture		*tex;
+	t_ray			ray;
 
 	x = 0;
 	SDL_RenderClear(e->r);
@@ -89,24 +90,30 @@ int			render_frame(t_env  *e, t_vector2i s)
 	//sur = SDL_CreateRGBSurfaceWithFormat(0, s.x, s.y, 32, SDL_PIXELFORMAT_RGBA8888);
 	//SDL_LockSurface(sur);
 	//printf("\nRendering start :\n");
+	ray = set_ray(e->m, e->p->pos, e->p->rot, e->p->c_sector, 0);
 	while (x < s.x)
 	{
 		//printf("	For x = %f\n",x);
-		camX = 2 * x / (double)s.x - (double)1;
+		camX = 2 * x / (float)s.x - (float)1;
 		//printf("		Camx : %f", camX);
-		e->p->raydir = (t_vector2d) {(double)(e->p->rot.x + e->p->plane.x * camX),
-									(double)(e->p->rot.y + e->p->plane.y * camX)};
+		ray.direction = (t_vector2f) {(float)(e->p->rot.x + e->p->plane.x * camX),
+									(float)(e->p->rot.y + e->p->plane.y * camX)};
 		//printf("		plane : {%f, %f}\n", e->p->plane.x, e->p->plane.y); 
 
-		//printf("		Raydir : {%f, %f}\n", e->p->raydir.x, e->p->raydir.y); 
-		hit = cast_ray(e->p, e->m, e->p->raydir, e->p->c_sector, -1);
-		//printf("		Hit info :\n");
-		//printf("			Dist         : %f\n",hit.dist);
-		//printf("			Pos          : {%f ; %f}\n",hit.pos.x,hit.pos.y);
-		//printf("			Wall type    : %d\n",hit.type);
-		//printf("			Hit append   : %d\n",hit.wall_hit);
-		if (hit.wall_hit)
+	//	printf("		Raydir : {%f, %f}\n", ray.direction.x, ray.direction.y);
+		hit = cast_ray(ray);
+	//	printf("hit dist uncorrected %f\n", hit.dist);
+		hit.dist *= ((e->p->rot.x * ray.direction.x + e->p->rot.y * ray.direction.y) /
+			(hypotl(e->p->rot.x, e->p->rot.y) * hypotl(ray.direction.x, ray.direction.y)));
+		//hit = cast_ray(e->p, e->m, e->p->raydir, e->p->c_sector, -1);
+	//	printf("		Hit info :\n");
+	//	printf("			Dist         : %f\n",hit.dist);
+	//	printf("			Pos          : {%f ; %f}\n",hit.pos.x,hit.pos.y);
+	//	printf("			Wall type    : %d\n",hit.type);
+	//	printf("			Hit append   : %d\n",hit.result);
+		if (hit.result)
 		{
+			//printf("Hit :)\n");
 			l.x = x;
 			l.h = (int)(s.y / hit.dist);
 			l.dr.x = (double)-l.h / 2 + s.y / 2 < 0 ? 0 : (double)-l.h / 2 + s.y / 2;

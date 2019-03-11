@@ -14,8 +14,8 @@
 
 void		move_player(t_env *e, t_player *p, float delta_time)
 {
-	t_vector2d	n_pos;
-	t_vector2d	d;
+	t_vector2f	n_pos;
+	t_vector2f	d;
 	t_hit		hit;
 	t_gate		*g;
 
@@ -31,20 +31,38 @@ void		move_player(t_env *e, t_player *p, float delta_time)
 		n_pos.x = p->speed * delta_time  * d.x;
 		n_pos.y = p->speed * delta_time  * d.y;
 	}
-	hit = cast_ray(p, e->m, n_pos, p->c_sector, -1);
+	hit = cast_ray(set_ray(e->m, p->pos, n_pos, p->c_sector, 1));
+	//hit = cast_ray(p, e->m, n_pos, p->c_sector, -1);
 	n_pos.x += p->pos.x;
 	n_pos.y += p->pos.y;
-	if (hit.type)
+	//printf("hit.type : %d\n", hit.result);
+	if (hit.result > 0)
 	{
-		n_pos.x = (n_pos.x < hit.pos.x) == (p->pos.x < hit.pos.x) ? n_pos.x : p->pos.x;
-		n_pos.y = (n_pos.y < hit.pos.y) == (p->pos.y < hit.pos.y) ? n_pos.y : p->pos.y;
+		if (hit.type)
+		{
+			n_pos.x = (n_pos.x < hit.pos.x) == (p->pos.x < hit.pos.x) ? n_pos.x : p->pos.x;
+			n_pos.y = (n_pos.y < hit.pos.y) == (p->pos.y < hit.pos.y) ? n_pos.y : p->pos.y;
+		}
+		else
+		{
+			if (((n_pos.x < hit.pos.x) != (p->pos.x < hit.pos.x) || (n_pos.y < hit.pos.y) != (p->pos.y < hit.pos.y)) && hit.wall->gate)
+			{
+				//printf("OK\n");
+				g = hit.wall->gate;
+				if (g)
+					p->c_sector = p->c_sector == g->s_in ? g->s_out : g->s_in;
+			}
+			else
+			{
+				n_pos.x = (n_pos.x < hit.pos.x) == (p->pos.x < hit.pos.x) ? n_pos.x : p->pos.x;
+				n_pos.y = (n_pos.y < hit.pos.y) == (p->pos.y < hit.pos.y) ? n_pos.y : p->pos.y;
+			}
+			
+		}
+		
 	}
-	else
+	if (hit.type == 2)
 	{
-		g = hit.wall->gate;
-	//	printf("%d\n", &g);
-		if (!g)
-			p->c_sector = p->c_sector == g->s_in ? g->s_out : g->s_in;
 	}
 	p->pos = n_pos;
 
@@ -82,16 +100,16 @@ if (mvmnt.x > 0 && mvmnt.y > 0
 
 t_player	*rotate_player(t_player *p, int left, float delta_time)
 {
-	t_vector2d	new_rotation;
-	t_vector2d	new_plane;
+	t_vector2f	new_rotation;
+	t_vector2f	new_plane;
 	double		speed;
 
 	speed = p->r_speed * delta_time * left;
-	new_rotation = (t_vector2d){
+	new_rotation = (t_vector2f){
 		p->rot.x * cos(speed) - p->rot.y * sin(speed),
 		p->rot.x * sin(speed) + p->rot.y * cos(speed)
 	};
-	new_plane = (t_vector2d){
+	new_plane = (t_vector2f){
 		p->plane.x * cos(speed) - p->plane.y * sin(speed),
 		p->plane.x * sin(speed) + p->plane.y * cos(speed)
 	};
@@ -114,9 +132,9 @@ t_player	*init_player(int fd)
 		return (NULL);
 	tab = ft_strsplit(l, ' ');
 	p->c_sector = ft_atoi(tab[1]);
-	p->pos = (t_vector2d) {(float)ft_atof(tab[2]), (float)ft_atof(tab[3])};
-	p->rot = (t_vector2d) {(float)atof(tab[4]), (float)atof(tab[5])};
-	p->plane =(t_vector2d) {(float) 0, (float)0.66};
+	p->pos = (t_vector2f) {(float)ft_atof(tab[2]), (float)ft_atof(tab[3])};
+	p->rot = (t_vector2f) {(float)atof(tab[4]), (float)atof(tab[5])};
+	p->plane =(t_vector2f) {(float) 0, (float)0.66};
 	p->speed = 3.01;
 	p->r_speed = 0.0174533*10;
 	return (p);

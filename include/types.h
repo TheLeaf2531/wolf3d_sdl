@@ -72,13 +72,13 @@ typedef struct			s_map
 typedef struct			s_player
 {
 	int			c_sector;
-	t_vector2d	pos;
-	t_vector2d	rot;
+	t_vector2f	pos;
+	t_vector2f	rot;
 	float		speed;
 	float		r_speed;
-	t_vector2d	plane;
-	t_vector2d	raydir;
-	t_vector2d	mvmt;
+	t_vector2f	plane;
+	t_vector2f	raydir;
+	t_vector2f	mvmt;
 	int			rotate;
 }						t_player;
 
@@ -89,6 +89,18 @@ typedef struct			s_rgba
 	Uint8		b;
 	Uint8		a;
 }						t_rgba;
+
+typedef struct 			s_ray
+{
+	t_vector2f		origin;
+	t_vector2f		direction;
+	int				origin_sector;
+	int				excluded_wall;
+	int				current_sector;
+	int				gate_stop;
+	float			mat[3][2];
+	t_map			*map;
+}						t_ray;
 
 typedef struct			s_rayenv
 {
@@ -108,7 +120,7 @@ typedef struct			s_line
 
 typedef struct			s_hit
 {
-	int			wall_hit;
+	int			result;
 	double		dist;
 	t_vector2f	pos;
 	int			type;

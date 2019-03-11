@@ -77,10 +77,11 @@ void	update_event(t_env *e)
 int main(int argc, char *argv[])
 {
 	t_env	*e;
+	int 	fps;
+	int counter;
+	counter = 0;
+	fps = 0;
 	//t_hit	hit;
-	int		i;
-
-	i = 0;
 	if (argc != 2)
 		return (0);
 	if ((e = init_env((t_vector2i){WIDTH, HEIGHT})))
@@ -96,12 +97,21 @@ int main(int argc, char *argv[])
 		//SDL_ShowCursor(SDL_DISABLE);
 		while (e->running)
 		{
+			counter += SDL_GetTicks();
+			fps++;
+			if (counter > 1000)
+			{
+				counter = 0;
+				//printf("FPS : %d\n", fps);
+				fps = 0;
+			}
 			//printf("DeltaTime : %f\n", e->time.delta_time);
 			e->time.frame_start = SDL_GetTicks();
 			update_event(e);
 			update_player(e);
 			render_frame(e, e->size);
 			e->time.frame_end = SDL_GetTicks();
+			printf("Delta : %f\n", e->time.delta_time);
 			e->time.delta_time = (float)(e->time.frame_end - e->time.frame_start) / 1000;
 		}
 		//hit = cast_ray(e->p, e->m, e->p->c_sector, -1);
