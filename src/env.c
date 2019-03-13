@@ -38,7 +38,7 @@ t_env					*init_env(t_vector2i s)
 	e->size = s;
 	if (!(e->w = init_window(s)))
 		return (NULL);
-	if (!(e->r = SDL_CreateRenderer(e->w, -1, SDL_RENDERER_SOFTWARE)))
+	if (!(e->r = SDL_CreateRenderer(e->w, -1, SDL_RENDERER_ACCELERATED)))
 		return (NULL);
 	//SDL_SetRenderDrawColor(e->r, 0, 0, 0, 255);
 	//SDL_RenderClear(e->r);
