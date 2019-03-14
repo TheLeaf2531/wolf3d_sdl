@@ -1,8 +1,8 @@
 NAME = Wolf
 CC = gcc
-CFLAGS =  -I include -I libft
-LDPC = -L lib -L libft -lmingw32 -lSDL2main -lSDL2  
-LD = -L /Users/vboissel/.brew/Cellar/sdl2/2.0.9/lib -l SDL2-2.0.0
+CFLAGS = -Wall -Wextra -Werror -O3 -I include -I libft
+LD = -L lib -L libft -lmingw32 -lSDL2main -lSDL2  
+
 
 
 
