@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
 	//t_hit	hit;
 	if (argc != 2)
 		return (0);
+	
 	if ((e = init_env((t_vector2i){WIDTH, HEIGHT})))
 	{
 		if (!(load_file(argv[1], e)))
@@ -111,8 +112,8 @@ int main(int argc, char *argv[])
 			update_player(e);
 			render_frame(e, e->size);
 			e->time.frame_end = SDL_GetTicks();
-			printf("Delta : %f\n", e->time.delta_time);
-			e->time.delta_time = (float)(e->time.frame_end - e->time.frame_start) / 1000;
+			//printf("Delta : %f\n", e->time.delta_time);
+			e->time.delta_time = (float)(e->time.frame_end - e->time.frame_start) / 1000.0F;
 		}
 		//hit = cast_ray(e->p, e->m, e->p->c_sector, -1);
 		//printf("Hit info :\n");

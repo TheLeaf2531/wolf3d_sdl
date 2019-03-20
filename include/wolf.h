@@ -13,16 +13,15 @@
 #ifndef WOLF_H
 # define WOLF_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <SDL2/SDL.h>
-#include <math.h>
-#include "types.h"
-#include "libft.h"
-
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <math.h>
+# include <SDL2/SDL.h>
+# include "types.h"
+# include "libft.h"
 
 # define degreesToRadians(angleDegrees) ((angleDegrees) * M_PI / 180.0)
 # define radiansToDegrees(angleRadians) ((angleRadians) * 180.0 / M_PI)
@@ -38,5 +37,6 @@ t_ray			set_ray(t_map *map, t_vector2f origin,
 int				render_frame(t_env  *e, t_vector2i s);
 t_player		*rotate_player(t_player *p, int left, float delta_time);
 void			move_player(t_env *e, t_player *p, float delta_time);
+void			read_error(const char	*error);
 
 #endif

@@ -134,7 +134,7 @@ t_player	*init_player(int fd)
 	p->c_sector = ft_atoi(tab[1]);
 	p->pos = (t_vector2f) {(float)ft_atof(tab[2]), (float)ft_atof(tab[3])};
 	p->rot = (t_vector2f) {(float)atof(tab[4]), (float)atof(tab[5])};
-	p->plane =(t_vector2f) {(float) 0, (float)0.66};
+	p->plane =(t_vector2f) {0.0F, 0.66F};
 	p->speed = 3.01;
 	p->r_speed = 0.0174533*10;
 	return (p);
