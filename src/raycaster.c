@@ -12,6 +12,14 @@
 
 #include "wolf.h"
 
+
+
+static double newPrecision(double n, double i) 
+{ 
+    return floor(pow(10,i)*n)/pow(10,i); 
+}
+
+
 t_ray				set_ray(t_map *map, t_vector2f origin,
 							t_vector2f direction, int origin_sector,
 							int gate_stop)
@@ -44,9 +52,9 @@ static	int			coherent_hit(t_ray ray, t_wall *w, t_hit hit)
 			(ray.direction.x > 0.0F && hit.pos.x < ray.origin.x) ||
 			(ray.direction.y > 0.0F && hit.pos.y < ray.origin.y))
 		is_legit = 0;
-	else if (hit.pos.x < ran_x.x || hit.pos.x > ran_x.y)
+	else if (hit.pos.x < ran_x.x - 0.00001F|| hit.pos.x > ran_x.y + 0.00001F)
 		is_legit = 0;
-	else if (hit.pos.y < ran_y.x || hit.pos.y > ran_y.y)
+	else if (hit.pos.y < ran_y.x - 0.00001F|| hit.pos.y > ran_y.y + 0.00001F)
 		is_legit = 0;
 	return (is_legit);	
 }
@@ -55,13 +63,13 @@ static t_hit		intersection(t_ray ray, t_wall *w)
 {
 	t_hit		hit;
 	t_gate		*gate;
-	float		det;
+	double		det;
 
 	det = ray.mat[0][0] * ray.mat[1][1] - ray.mat[1][0] * ray.mat[0][1];
-	if (det != 0.0F)
+	if (det > 0.00001 || det < 0.00001)
 	{
 		hit.pos.x = (ray.mat[2][0] * ray.mat[1][1] - ray.mat[2][1] * ray.mat[1][0]) / det;
-		hit.pos.y = (ray.mat[0][0] * ray.mat[2][1] - ray.mat[2][0] * ray.mat[0][1]) / det; 
+		hit.pos.y = (ray.mat[0][0] * ray.mat[2][1] - ray.mat[2][0] * ray.mat[0][1]) / det;
 		if (coherent_hit(ray, w, hit))
 		{
 			if (w->w_type == 0 && w->gate && !ray.gate_stop)
@@ -90,6 +98,7 @@ static t_hit		intersection(t_ray ray, t_wall *w)
 	return (hit);
 }
 
+
 t_hit		cast_ray(t_ray ray)
 {
 	t_hit		hit;
@@ -109,8 +118,8 @@ t_hit		cast_ray(t_ray ray)
 			w = ray.map->sector[ray.current_sector]->wall[i];
 			ray.mat[0][1] = (w->pos[1].y - w->pos[0].y) / (w->pos[1].x - w->pos[0].x);
 			ray.mat[1][1] = -1.0F;
-			ray.mat[2][1] =	-(w->pos[0].y - ray.mat[0][1] * w->pos[0].x);				
-			if (w->pos[0].x == w->pos[1].x)
+			ray.mat[2][1] =	(w->pos[0].y - ray.mat[0][1] * w->pos[0].x) * -1.0F;				
+			if (fabs(w->pos[0].x - w->pos[1].x) < 0.00001F)
 			{
 				ray.mat[0][1] = 1.0F;
 				ray.mat[1][1] = 0.0F;
@@ -118,6 +127,7 @@ t_hit		cast_ray(t_ray ray)
 			}
 			hit = intersection(ray,
 					ray.map->sector[ray.current_sector]->wall[i]);
+			
 		}
 		i++;
 	}

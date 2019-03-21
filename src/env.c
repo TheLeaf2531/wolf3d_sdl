@@ -12,20 +12,34 @@
 
 #include "wolf.h"
 
+void					read_error(const char	*error)
+{
+	perror(error);
+	exit(0);
+}
 
+static void				load_textures(t_env *e)
+{
+	e->asset[0].id	  = 0;
+	if (!(e->asset[0].surface = SDL_LoadBMP("./textures/ground.bmp")))
+		read_error(SDL_GetError());
+	e->asset[0].id	  = 1;
+	if (!(e->asset[0].surface = SDL_LoadBMP("./textures/wall.bmp")))
+		read_error(SDL_GetError());;
+}
 
 static SDL_Window		*init_window(t_vector2i s)
 {
 	SDL_Window	*w;
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
-		return (NULL);
+		read_error(SDL_GetError());
 	if (!(w = SDL_CreateWindow("WOLF_3D", SDL_WINDOWPOS_CENTERED,
 								SDL_WINDOWPOS_CENTERED,
 								s.x,
 								s.y,
 								SDL_WINDOW_SHOWN)))
-		return (NULL);
+		read_error(SDL_GetError());
 	return (w);
 }
 
@@ -34,14 +48,14 @@ t_env					*init_env(t_vector2i s)
 	t_env	*e;
 
 	if (!(e = ft_memalloc(sizeof(t_env))))
-		return (NULL);
+		read_error("e malloc failed | init_env");
 	e->size = s;
-	if (!(e->w = init_window(s)))
-		return (NULL);
+	e->w = init_window(s);
 	if (!(e->r = SDL_CreateRenderer(e->w, -1, SDL_RENDERER_ACCELERATED)))
-		return (NULL);
-	//SDL_SetRenderDrawColor(e->r, 0, 0, 0, 255);
-	//SDL_RenderClear(e->r);
-	//SDL_RenderPresent(e->r);
+		perror(SDL_GetError());
+	//TODO : switch type renderer
+	//else if (!(e->r = SDL_CreateRenderer(e->w, -1, SDL_RENDERER_SOFTWARE)))
+	//	read_error(SDL_GetError());
+	load_textures(e);
 	return (e);
 }
