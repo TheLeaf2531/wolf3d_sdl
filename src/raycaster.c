@@ -12,14 +12,6 @@
 
 #include "wolf.h"
 
-
-
-static double newPrecision(double n, double i) 
-{ 
-    return floor(pow(10,i)*n)/pow(10,i); 
-}
-
-
 t_ray				set_ray(t_map *map, t_vector2f origin,
 							t_vector2f direction, int origin_sector,
 							int gate_stop)

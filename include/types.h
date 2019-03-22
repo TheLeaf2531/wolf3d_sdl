@@ -127,6 +127,19 @@ typedef struct			s_hit
 	int				result;
 }						t_hit;
 
+typedef struct			s_mapLine
+{
+	int		number;
+	char	**fields;
+	int		fields_nbr;
+}						t_mapLine;
+
+typedef	struct			s_mapfile
+{
+	int			line_number;
+	t_list		*list;
+}						t_mapfile;
+
 typedef struct 			s_texture
 {
 	t_vector2i		s;

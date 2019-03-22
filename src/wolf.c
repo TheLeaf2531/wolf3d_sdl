@@ -92,6 +92,7 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "Error while parsing level\n");
 			exit(0);
 		}
+		load_map(argv[1]);
 		e->time = (t_time){(int)0, (int)0, (int)0};
 		e->running = 1;
 		SDL_SetRelativeMouseMode(1);

@@ -20,8 +20,8 @@
 # include <sys/stat.h>
 # include <math.h>
 # include <SDL2/SDL.h>
-# include "types.h"
 # include "libft.h"
+# include "types.h"
 
 # define degreesToRadians(angleDegrees) ((angleDegrees) * M_PI / 180.0)
 # define radiansToDegrees(angleRadians) ((angleRadians) * 180.0 / M_PI)
@@ -38,5 +38,7 @@ int				render_frame(t_env  *e, t_vector2i s);
 t_player		*rotate_player(t_player *p, int left, float delta_time);
 void			move_player(t_env *e, t_player *p, float delta_time);
 void			read_error(const char	*error);
+t_mapfile		*load_map(char *filename);
+size_t			elem_nbrs(char const *s, char c);
 
 #endif

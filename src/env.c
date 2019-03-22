@@ -21,10 +21,10 @@ void					read_error(const char	*error)
 static void				load_textures(t_env *e)
 {
 	e->asset[0].id	  = 0;
-	if (!(e->asset[0].surface = SDL_LoadBMP("./textures/ground.bmp")))
+	if (!(e->asset[0].surface = SDL_LoadBMP("./textures/placeholder.bmp")))
 		read_error(SDL_GetError());
 	e->asset[0].id	  = 1;
-	if (!(e->asset[0].surface = SDL_LoadBMP("./textures/wall.bmp")))
+	if (!(e->asset[0].surface = SDL_LoadBMP("./textures/ground.bmp")))
 		read_error(SDL_GetError());;
 }
 

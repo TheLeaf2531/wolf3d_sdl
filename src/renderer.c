@@ -33,7 +33,6 @@ static void vert_line(t_texture *tex, t_line l, t_rgba c)
 static t_rgba	get_color(t_hit hit)
 {
 	t_rgba		c;
-	float		fact;
 
 	if (hit.type == 1)
 		c = (t_rgba){(Uint8)120, (Uint8)120, (Uint8)120, (Uint8)255};
@@ -71,8 +70,7 @@ int			render_frame(t_env  *e, t_vector2i s)
     t_line			l;
     t_texture		*tex;
 	t_ray			ray;
-
-	t_hit			*h;
+	
 	x = 0;
 	if (SDL_RenderClear(e->r))
 		read_error(SDL_GetError());
