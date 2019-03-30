@@ -20,8 +20,8 @@
 # include <sys/stat.h>
 # include <math.h>
 # include <SDL2/SDL.h>
-# include "libft.h"
-# include "types.h"
+# include "../libft/libft.h"
+# include "../include/types.h"
 
 # define degreesToRadians(angleDegrees) ((angleDegrees) * M_PI / 180.0)
 # define radiansToDegrees(angleRadians) ((angleRadians) * 180.0 / M_PI)
@@ -37,8 +37,21 @@ t_ray			set_ray(t_map *map, t_vector2f origin,
 int				render_frame(t_env  *e, t_vector2i s);
 t_player		*rotate_player(t_player *p, int left, float delta_time);
 void			move_player(t_env *e, t_player *p, float delta_time);
-void			read_error(const char	*error);
-t_mapfile		*load_map(char *filename);
+void			read_error(const char *error);
+//t_mapfile		*load_map(char *filename);
 size_t			elem_nbrs(char const *s, char c);
+
+void			update_event(t_env *e);
+t_texture		*create_texture(t_env *e, t_vector2i s);
+
+t_map			*parse_map_alter(char *filename, t_env *e);
+t_list			*parse_sectors(t_map *map, t_list *node);
+t_list			*parse_gates(t_map *map, t_list *node);
+t_player		*init_player_alter(t_list	*node);
+
+SDL_Surface		*find_surface(t_ressources	*ressources, int texture_id);
+float			distance(t_vector2f a, t_vector2f b);
+
+int				alter_render_frame(t_env *e, t_vector2i size);
 
 #endif

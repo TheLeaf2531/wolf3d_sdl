@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "wolf.h"
+#include "../include/wolf.h"
+
 
 void		move_player(t_env *e, t_player *p, float delta_time)
 {
@@ -137,5 +138,24 @@ t_player	*init_player(int fd)
 	p->plane =(t_vector2f) {0.0F, 0.66F};
 	p->speed = 3.01;
 	p->r_speed = 0.0174533*10;
+	return (p);
+}
+
+t_player	*init_player_alter(t_list	*node)
+{
+	t_player	*p;
+	t_mapLine	*line;
+
+	line = node->content;
+	if (!(p = ft_memalloc(sizeof(t_player))))
+		return (NULL);
+	if (line->fields_nbr != 6)
+		return (NULL);
+	p->c_sector = ft_atoi(line->fields[1]);
+	p->pos = (t_vector2f) {(float)ft_atof(line->fields[2]), (float)ft_atof(line->fields[3])};
+	p->rot = (t_vector2f) {(float)ft_atof(line->fields[4]), (float)ft_atof(line->fields[5])};
+	p->plane = (t_vector2f) {0.0F, 0.66F};
+	p->speed = 5.00F;
+	p->r_speed = 0.0174533F * 10.0F;
 	return (p);
 }

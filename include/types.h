@@ -19,6 +19,7 @@
 typedef unsigned int	uint32;
 typedef unsigned char	uint8;
 
+
 typedef struct			s_vector2i
 {
 	int				x;
@@ -163,6 +164,11 @@ typedef	struct 			s_asset
 	SDL_Surface		*surface;
 }						t_asset;
 
+typedef struct			s_ressources
+{
+	int				textures_nbr;
+	t_asset			textures[3];
+}						t_ressources;
 
 typedef struct			s_env
 {
@@ -172,7 +178,7 @@ typedef struct			s_env
 	t_map			*m;
 	t_player		*p;
 	t_time			time;
-	t_asset			asset[2];
+	t_ressources	*ressources;
 	int 			running;
 }						t_env;
 #endif

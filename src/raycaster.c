@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "wolf.h"
+#include "../include/wolf.h"
+
 
 t_ray				set_ray(t_map *map, t_vector2f origin,
 							t_vector2f direction, int origin_sector,
@@ -119,7 +120,6 @@ t_hit		cast_ray(t_ray ray)
 			}
 			hit = intersection(ray,
 					ray.map->sector[ray.current_sector]->wall[i]);
-			
 		}
 		i++;
 	}

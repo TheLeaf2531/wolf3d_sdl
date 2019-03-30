@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "wolf.h"
+#include "../include/wolf.h"
+
 
 static t_sector		*init_sector(int fd)
 {
