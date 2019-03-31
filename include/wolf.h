@@ -50,8 +50,11 @@ t_list			*parse_gates(t_map *map, t_list *node);
 t_player		*init_player_alter(t_list	*node);
 
 SDL_Surface		*find_surface(t_ressources	*ressources, int texture_id);
-float			distance(t_vector2f a, t_vector2f b);
 
 int				alter_render_frame(t_env *e, t_vector2i size);
+
+int				evaluate_distance(t_vector2f o, t_vector2f p_1, t_vector2f p_2);
+float			distance(t_vector2f a, t_vector2f b);
+
 
 #endif

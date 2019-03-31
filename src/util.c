@@ -12,6 +12,21 @@
 
 #include "../include/wolf.h"
 
+int		evaluate_distance(t_vector2f o, t_vector2f p_1, t_vector2f p_2)
+{
+	float	dist[2];
+	int		res;
+
+	dist[0] = distance(o, p_1);
+	dist[1] = distance(o, p_2);
+	if (dist[0] < dist[1])
+		res = -1;
+	else if (dist[0] > dist[1])
+		res = 1;
+	else
+		res = 0;	
+	return (res);
+}
 
 float		distance(t_vector2f a, t_vector2f b)
 {

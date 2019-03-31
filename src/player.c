@@ -12,7 +12,54 @@
 
 #include "../include/wolf.h"
 
+static t_vector2f		calc_new_pos(t_player *p, float delta_time)
+{
+	t_vector2f	n_pos;
+	t_vector2f	d;
 
+	if (p->mvmt.y != 0)
+	{
+		n_pos.x = p->speed * delta_time * p->mvmt.y * p->rot.x;
+		n_pos.y = p->speed * delta_time * p->mvmt.y * p->rot.y;
+	}
+	if (p->mvmt.x != 0)
+	{
+		d.x = p->rot.x  * cos(degreesToRadians(p->mvmt.x * 90))
+				- p->rot.y * sin(degreesToRadians(p->mvmt.x * 90));
+		d.y = p->rot.x  * sin(degreesToRadians(p->mvmt.x * 90))
+				+ p->rot.y * cos(degreesToRadians(p->mvmt.x * 90));
+		n_pos.x = p->speed * delta_time  * d.x;
+		n_pos.y = p->speed * delta_time  * d.y;
+	}
+	n_pos.x += p->pos.x;
+	n_pos.y += p->pos.y;
+	return (n_pos);
+}
+
+void		move_player(t_env *e, t_player *p, float delta_time)
+{
+	t_vector2f	n_pos;
+	t_hit		hit;
+	t_gate		*g;
+
+	n_pos = calc_new_pos(p, delta_time);
+	hit = cast_ray(set_ray(e->m, p->pos, n_pos, p->c_sector, 1));
+	if (hit.result > 0)
+	{
+		if (hit.type == 0 && ((n_pos.x < hit.pos.x) != (p->pos.x < hit.pos.x) || (n_pos.y < hit.pos.y) != (p->pos.y < hit.pos.y)) && hit.wall->gate)
+		{
+			g = hit.wall->gate;
+			if (g)
+				p->c_sector = p->c_sector == g->s_in ? g->s_out : g->s_in;
+		}
+		else if ((n_pos.x < hit.pos.x) != (p->pos.x < hit.pos.x))
+			n_pos = (t_vector2f){p->pos.x, p->pos.y};
+	}
+	p->pos = n_pos;
+}
+
+/*
+// 		OLD MVMT
 void		move_player(t_env *e, t_player *p, float delta_time)
 {
 	t_vector2f	n_pos;
@@ -66,39 +113,7 @@ void		move_player(t_env *e, t_player *p, float delta_time)
 	{
 	}
 	p->pos = n_pos;
-
-
-	/*
-	a = atan2f(p->rot.y - p->mvmt.y, p->rot.x - p->mvmt.x);
-	p->mvmt.x = cosf(a * p->mvmt.x) - sinf(a * p->mvmt.y);
-	p->mvmt.y = sinf(a * p->mvmt.x) + cosf(a * p->mvmt.y);
-	hit = cast_ray(p, e->m, p->mvmt, p->c_sector, -1);
-	p->mvmt = mv_tmp;
-	mvmnt.x = (mvmnt.x < hit.pos.x) == (p->pos.x < hit.pos.x) ? mvmnt.x : p->pos.x;
-	mvmnt.y = (mvmnt.y < hit.pos.y) == (p->pos.y < hit.pos.y) ? mvmnt.y : p->pos.y;
-	p->pos = mvmnt;
-	p->mvmt = (t_vector2d){0,0};*/
-	//printf("mvmnt {%f ; %f}\n", mvmnt.x, mvmnt.y);
-	/*
-if (mvmnt.x > 0 && mvmnt.y > 0
-		&& mvmnt.x < (float)e->map->size.x && mvmnt.y < (float)e->map->size.y)
-	{
-		if ((int)e->player->pos.x > (int)mvmnt.x)
-			if (e->map->c[(int)mvmnt.x][(int)mvmnt.y].w_id[0] != 0)
-				mvmnt.x = e->player->pos.x;
-		if ((int)e->player->pos.x < (int)mvmnt.x)
-			if (e->map->c[(int)mvmnt.x][(int)mvmnt.y].w_id[2] != 0)
-				mvmnt.x = e->player->pos.x;
-		if ((int)e->player->pos.y > (int)mvmnt.y)
-			if (e->map->c[(int)mvmnt.x][(int)mvmnt.y].w_id[1] != 0)
-				mvmnt.y = e->player->pos.y;
-		if ((int)e->player->pos.y < (int)mvmnt.y)
-			if (e->map->c[(int)mvmnt.x][(int)mvmnt.y].w_id[3] != 0)
-				mvmnt.y = e->player->pos.y;
-		e->player->pos = mvmnt;
-	}*/
-}
-
+}*/
 t_player	*rotate_player(t_player *p, int left, float delta_time)
 {
 	t_vector2f	new_rotation;
